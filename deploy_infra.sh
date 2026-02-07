@@ -25,6 +25,11 @@ echo "📦 Checking/Creating ECR Repositories..."
 aws ecr describe-repositories --repository-names patient-outreach-server --region $REGION || aws ecr create-repository --repository-name patient-outreach-server --region $REGION
 aws ecr describe-repositories --repository-names patient-outreach-client --region $REGION || aws ecr create-repository --repository-name patient-outreach-client --region $REGION
 
+# 3.5 Build Images for linux/amd64 (Required for Fargate)
+echo "🔨 Building Images for linux/amd64..."
+docker build --platform linux/amd64 -f server.Dockerfile -t patientoutreachandappointmentreminderplatform-server:latest .
+docker build --platform linux/amd64 -f client.Dockerfile -t patientoutreachandappointmentreminderplatform-client:latest .
+
 # 4. Tag and Push Server
 SERVER_REPO_URL="$ACCOUNT_ID.dkr.ecr.$REGION.amazonaws.com/patient-outreach-server"
 echo "📤 Pushing Server Image to $SERVER_REPO_URL..."
