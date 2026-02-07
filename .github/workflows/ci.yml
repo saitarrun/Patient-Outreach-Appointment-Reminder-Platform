@@ -18,18 +18,18 @@ jobs:
       uses: docker/setup-buildx-action@v3
 
     - name: Build Docker Images
-      run: docker-compose build server
+      run: docker compose build server
 
     - name: Start Infrastructure (DB & Redis)
       run: |
-        docker-compose up -d postgres redis
+        docker compose up -d postgres redis
         echo "Waiting for Database to initialize..."
         sleep 10
 
     - name: Run Integration Tests
       # Use built image dependencies directly
       run: |
-        docker-compose run --rm server sh -c "ls -la node_modules/.bin && npm run test --workspace=server"
+        docker compose run --rm server sh -c "ls -la node_modules/.bin && npm run test --workspace=server"
 
   deploy:
     name: Deploy to AWS
