@@ -20,8 +20,10 @@ const prisma = new PrismaClient();
 const PORT = process.env.PORT || 3000;
 
 import { metricsMiddleware } from './middleware/metrics';
+import { requestLogger } from './middleware/requestLogger';
 import { register } from './lib/metrics';
 
+app.use(requestLogger); // Add structured logging
 app.use(metricsMiddleware);
 app.use(limiter);
 app.use(cors());

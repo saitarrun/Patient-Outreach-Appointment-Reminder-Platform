@@ -1,4 +1,5 @@
 import { BullMQAdapter } from './queue/bullmq.adapter';
+import { logger } from '../lib/logger';
 import { remindersSentTotal } from '../lib/metrics';
 import { PrismaClient } from '@prisma/client';
 import { redisClient, acquireLock, releaseLock, checkIdempotencyKey, setIdempotencyKey } from './redis/redisService';
@@ -19,25 +20,25 @@ reminderQueue.processJob('send-reminder', async (job) => {
 
     // 1. Acquire Lock (prevent double processing if multiple workers)
     if (!await acquireLock(lockKey, 60)) {
-        console.log(`Skipping locked reminder for ${appointmentId}`);
+        logger.warn(`Skipping locked reminder for ${appointmentId}`, { appointmentId });
         return;
     }
 
     try {
-        console.log(`Processing reminder for appointment ${appointmentId} (Tenant: ${tenantId})`);
+        logger.info(`Processing reminder`, { appointmentId, tenantId });
 
         // Quiet Hours Check (9PM - 8AM)
         const now = new Date();
         const hour = now.getHours();
         if (hour >= 21 || hour < 8) {
-            console.log(`Skipping reminder during quiet hours (21:00-08:00)`);
+            logger.info(`Skipping reminder during quiet hours`, { appointmentId });
             return;
         }
 
         // 2. Idempotency Check (Business Logic level)
         const idempotencyKey = `processed:reminder:${appointmentId}`;
         if (await checkIdempotencyKey(idempotencyKey)) {
-            console.log(`Reminder already processed for ${appointmentId}`);
+            logger.info(`Reminder already processed`, { appointmentId });
             return;
         }
 
@@ -59,9 +60,9 @@ reminderQueue.processJob('send-reminder', async (job) => {
         // Metric: Success
         remindersSentTotal.inc({ type: 'EMAIL', tenantId, status: 'success' });
 
-        console.log(`Reminder sent for appointment ${appointmentId}`);
+        logger.info(`Reminder sent`, { appointmentId, tenantId });
     } catch (e) {
-        console.error("Error processing reminder", e);
+        logger.error("Error processing reminder", { error: e, appointmentId, tenantId });
         // Metric: Error
         remindersSentTotal.inc({ type: 'EMAIL', tenantId, status: 'error' });
         throw e; // Retry
@@ -82,5 +83,5 @@ export const scheduleReminder = async (appointmentId: string, date: Date, tenant
         delay,
         jobId // BullMQ will ignore duplicate adds with same Job ID
     });
-    console.log(`Scheduled reminder for ${appointmentId} at ${reminderTime} (JobId: ${jobId})`);
+    logger.info(`Scheduled reminder`, { appointmentId, reminderTime, jobId, tenantId });
 };
