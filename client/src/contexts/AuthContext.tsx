@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState } from 'react';
 
 interface User {
     id: string;
@@ -15,23 +15,22 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-    const [user, setUser] = useState<User | null>(null);
-    const [isLoading, setIsLoading] = useState(true);
-
-    useEffect(() => {
-        // Check for existing session on mount
+// Read the stored session lazily during state initialization (not in an effect)
+// so no synchronous setState-in-effect is needed.
+const readStoredUser = (): User | null => {
+    try {
         const storedUser = localStorage.getItem('admin_user');
-        if (storedUser) {
-            try {
-                setUser(JSON.parse(storedUser));
-            } catch (e) {
-                console.error("Failed to parse stored user", e);
-                localStorage.removeItem('admin_user');
-            }
-        }
-        setIsLoading(false);
-    }, []);
+        return storedUser ? (JSON.parse(storedUser) as User) : null;
+    } catch (e) {
+        console.error("Failed to parse stored user", e);
+        localStorage.removeItem('admin_user');
+        return null;
+    }
+};
+
+export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+    const [user, setUser] = useState<User | null>(readStoredUser);
+    const [isLoading] = useState(false);
 
     const login = async (email: string, password: string) => {
         // Use relative path to allow Nginx proxying
