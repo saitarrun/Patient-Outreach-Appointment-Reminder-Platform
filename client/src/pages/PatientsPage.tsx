@@ -1,6 +1,5 @@
 import { useEffect, useState, useMemo } from 'react';
 import type { Patient } from '@app/shared';
-// @ts-ignore
 import { useAuth } from '../contexts/AuthContext';
 import EmptyState from '../components/EmptyState';
 import AddPatientModal from '../components/AddPatientModal';
@@ -220,8 +219,8 @@ export default function PatientsPage() {
                                                     <p className="text-xs text-slate-500 font-mono">ID: {patient.id.slice(0, 8)}</p>
                                                 </div>
                                             </div>
-                                            <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-[10px] uppercase font-bold tracking-wider border ${true ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : 'bg-slate-500/10 text-slate-400 border-slate-500/20'}`}>
-                                                <span className={`w-1 h-1 rounded-full mr-1.5 ${true ? 'bg-emerald-400' : 'bg-slate-400'}`}></span>
+                                            <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-[10px] uppercase font-bold tracking-wider border ${(patient.active ?? true) ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : 'bg-slate-500/10 text-slate-400 border-slate-500/20'}`}>
+                                                <span className={`w-1 h-1 rounded-full mr-1.5 ${(patient.active ?? true) ? 'bg-emerald-400' : 'bg-slate-400'}`}></span>
                                                 Active
                                             </span>
                                         </div>
@@ -292,8 +291,8 @@ export default function PatientsPage() {
                                                 <div className="text-xs text-slate-500">{patient.phone}</div>
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap">
-                                                <span className={`inline-flex items-center px-2 py-0.5 rounded text-[10px] uppercase font-bold tracking-wider border ${true ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : 'bg-slate-500/10 text-slate-400 border-slate-500/20'}`}>
-                                                    <span className={`w-1 h-1 rounded-full mr-1.5 ${true ? 'bg-emerald-400' : 'bg-slate-400'}`}></span>
+                                                <span className={`inline-flex items-center px-2 py-0.5 rounded text-[10px] uppercase font-bold tracking-wider border ${(patient.active ?? true) ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : 'bg-slate-500/10 text-slate-400 border-slate-500/20'}`}>
+                                                    <span className={`w-1 h-1 rounded-full mr-1.5 ${(patient.active ?? true) ? 'bg-emerald-400' : 'bg-slate-400'}`}></span>
                                                     Active
                                                 </span>
                                             </td>
