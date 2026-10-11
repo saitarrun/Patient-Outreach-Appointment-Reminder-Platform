@@ -1,5 +1,4 @@
 import { useEffect, useState, useMemo } from 'react';
-// @ts-ignore
 import { useAuth } from '../contexts/AuthContext';
 import EmptyState from '../components/EmptyState';
 
