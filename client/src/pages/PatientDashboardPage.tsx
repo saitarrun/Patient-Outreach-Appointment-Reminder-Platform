@@ -8,9 +8,25 @@ interface Appointment {
     status: string;
 }
 
+interface StoredPatient {
+    id?: string;
+    firstName?: string;
+    lastName?: string;
+    email?: string;
+}
+
 const PatientDashboardPage: React.FC = () => {
     const navigate = useNavigate();
-    const [patient, setPatient] = useState<any>(null);
+    // Read the stored patient lazily during state initialization (not in an effect)
+    // so no synchronous setState-in-effect is needed.
+    const [patient] = useState<StoredPatient | null>(() => {
+        try {
+            const p = localStorage.getItem('patient');
+            return p ? (JSON.parse(p) as StoredPatient) : null;
+        } catch {
+            return null;
+        }
+    });
     const [appointments] = useState<Appointment[]>([{ id: 'uuid-1', date: '2025-02-12T10:00:00Z', type: 'Specialist Consultation', status: 'SCHEDULED' }]); // Mock data for demo
     const [pastVisits] = useState<Appointment[]>([
         { id: 'uuid-2', date: '2024-11-05T14:30:00Z', type: 'Annual Checkup', status: 'COMPLETED' },
@@ -22,12 +38,7 @@ const PatientDashboardPage: React.FC = () => {
         const t = localStorage.getItem('patientTenantId');
         if (!p || !t) {
             navigate('/portal/login');
-            return;
         }
-        setPatient(JSON.parse(p));
-
-        // Fetch Appointments (Mock for now, normally filtered by Patient ID in backend)
-        // In real app: GET /api/patients/me/appointments
     }, [navigate]);
 
     return (
