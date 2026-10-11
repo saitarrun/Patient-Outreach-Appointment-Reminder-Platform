@@ -20,6 +20,9 @@ jobs:
         cache: 'npm'
     - name: Install dependencies
       run: npm ci
+    - name: Build Shared Workspace
+      # @app/shared must be compiled to dist/ before the client type-checks and bundles
+      run: npm run build --workspace=shared
     - name: Lint Client
       run: npm run lint --workspace=client
     - name: Build Client
