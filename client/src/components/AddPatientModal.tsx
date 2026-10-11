@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import type { Patient } from '@app/shared';
-// @ts-ignore
 import { useAuth } from '../contexts/AuthContext';
 
 interface AddPatientModalProps {
@@ -52,8 +51,8 @@ export default function AddPatientModal({ isOpen, onClose, onSuccess }: AddPatie
             const newPatient = await res.json();
             onSuccess(newPatient);
             onClose();
-        } catch (err: any) {
-            setError(err.message);
+        } catch (err) {
+            setError(err instanceof Error ? err.message : 'Failed to create patient');
         } finally {
             setLoading(false);
         }
