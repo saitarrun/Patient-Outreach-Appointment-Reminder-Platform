@@ -15,6 +15,11 @@ export default defineConfig([
       reactHooks.configs.flat.recommended,
       reactRefresh.configs.vite,
     ],
+    rules: {
+      // AuthContext.tsx co-locates the `useAuth` hook with its provider;
+      // allow this single named export so the rule stays enforced elsewhere.
+      'react-refresh/only-export-components': ['error', { allowExportNames: ['useAuth'] }],
+    },
     languageOptions: {
       ecmaVersion: 2020,
       globals: globals.browser,
