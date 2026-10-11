@@ -32,7 +32,7 @@ const PatientLoginPage = () => {
             localStorage.setItem('patientTenantId', currentTenantId);
 
             navigate('/portal/dashboard');
-        } catch (err) {
+        } catch {
             setError('Login failed. Please check your details.');
         }
     };
